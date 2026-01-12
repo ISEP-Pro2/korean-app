@@ -1,0 +1,125 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground: #171717;
+  --background: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground: #ededed;
+    --background: #0a0a0a;
+  }
+}
+
+html {
+  font-family: 'Pretendard', system-ui, sans-serif;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Prevent pull-to-refresh on mobile */
+html, body {
+  overscroll-behavior-y: contain;
+}
+
+/* Safe area padding for mobile */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0);
+}
+
+/* Hide scrollbar but allow scrolling */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Custom button styles */
+.btn-primary {
+  @apply bg-primary-600 text-white font-semibold py-4 px-8 rounded-2xl 
+         active:bg-primary-700 active:scale-95 transition-all duration-150
+         disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-secondary {
+  @apply bg-gray-100 text-gray-900 font-medium py-3 px-6 rounded-xl
+         active:bg-gray-200 active:scale-95 transition-all duration-150
+         dark:bg-gray-800 dark:text-gray-100 dark:active:bg-gray-700;
+}
+
+.btn-ghost {
+  @apply text-gray-600 font-medium py-2 px-4 rounded-lg
+         active:bg-gray-100 transition-all duration-150
+         dark:text-gray-400 dark:active:bg-gray-800;
+}
+
+/* Card styles */
+.card {
+  @apply bg-white rounded-2xl p-4 shadow-sm border border-gray-100
+         dark:bg-gray-900 dark:border-gray-800;
+}
+
+/* Rating buttons */
+.rating-btn {
+  @apply flex-1 py-3 px-4 rounded-xl font-medium text-center
+         transition-all duration-150 active:scale-95;
+}
+
+.rating-easy {
+  @apply bg-success-50 text-success-600 active:bg-success-100
+         dark:bg-success-600/20 dark:text-success-500;
+}
+
+.rating-normal {
+  @apply bg-warning-50 text-warning-600 active:bg-warning-100
+         dark:bg-warning-600/20 dark:text-warning-500;
+}
+
+.rating-hard {
+  @apply bg-danger-50 text-danger-600 active:bg-danger-100
+         dark:bg-danger-600/20 dark:text-danger-500;
+}
