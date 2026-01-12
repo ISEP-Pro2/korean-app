@@ -62,8 +62,9 @@ src/
 │   ├── page.tsx        # Main page with tab navigation
 │   └── globals.css     # Global styles
 ├── components/
-│   ├── tabs/           # Tab components
+│   ├── tabs/           # Tab components (6 tabs)
 │   │   ├── TodayTab.tsx
+│   │   ├── TrainingTab.tsx    # NEW: Pattern-based training
 │   │   ├── SentencesTab.tsx
 │   │   ├── ListeningTab.tsx
 │   │   ├── PartnerTab.tsx
@@ -79,18 +80,23 @@ src/
 ├── data/               # Seed data
 │   ├── sentences.ts    # 30 foundation sentences
 │   ├── partnerScripts.ts
-│   └── program.ts
+│   ├── program.ts
+│   └── training.seed.ts    # NEW: 20+ patterns + slots
 ├── hooks/              # Custom React hooks
 │   ├── useAudioPlayer.ts
+│   ├── useTextToSpeech.ts   # NEW: Web Speech API TTS
 │   └── useTimer.ts
 ├── lib/                # Core logic
-│   ├── db.ts          # Dexie database
-│   ├── types.ts       # TypeScript types
-│   ├── scheduling.ts  # Sentence selection logic
-│   └── context.tsx    # React context
+│   ├── db.ts           # Dexie database (v2)
+│   ├── types.ts        # TypeScript types
+│   ├── scheduling.ts   # Sentence selection logic
+│   ├── training-types.ts    # NEW: Training types
+│   ├── training-generator.ts # NEW: Sentence generation
+│   └── context.tsx     # React context
 └── test/
     ├── setup.ts
-    └── scheduling.test.ts
+    ├── scheduling.test.ts
+    └── training-generator.test.ts  # NEW: 13 tests
 ```
 
 ## 🎮 App Flow
@@ -113,7 +119,26 @@ src/
    - Script cards for guided conversation
    - Big "스킵" button (no guilt)
 
+### Training Mode (훈련)
+
+Pattern-based sentence generation for structured practice:
+
+- **20+ patterns** across 4 topics (Dinner, Weather, Work, Weekend)
+- **8 slot types**: Food, Place, Activity, Weather, Temperature, Intensity, Feeling, Workplace
+- **Progressive difficulty**: 
+  - Days 1-13: Single-slot sentences (easier)
+  - Day 14+: Two-slot sentences (more complex)
+- **Daily flow**: 
+  1. Listen to generated sentence (TTS)
+  2. Repeat aloud
+  3. Recall from memory
+  4. Rate difficulty: 쉬움/보통/어려움
+- **Mastery tracking**: NEW → LEARNING → REVIEWING → MASTERED
+- **5-sentence sessions** with automatic slot variety
+
 ## 📊 Scheduling Logic
+
+### Foundation Sentences (Spaced Repetition)
 
 Simplified spaced repetition (not full SM-2):
 
@@ -127,6 +152,21 @@ Simplified spaced repetition (not full SM-2):
 - 어려움 (Hard): Move back one state
 
 **Pin Rule**: If rated "어려움" 2+ times in 7 days, sentence is pinned for tomorrow.
+
+### Training Patterns (Progressive Generation)
+
+Pattern-based sentences generated with variable slots:
+
+**Mastery States**: NEW → LEARNING → REVIEWING → MASTERED
+
+**Slot Difficulty**:
+- Days 1-13: Max 1 slot varies (others fixed)
+- Day 14+: Max 2 slots vary
+
+**Example Pattern**:
+- Template: "{PLACE}에서 {FOOD}을/를 먹었어요"
+- Slots: PLACE (6 options), FOOD (6 options)
+- Variations: Up to 36 different sentences
 
 ## 📅 8-Week Program
 
@@ -191,6 +231,9 @@ Tests cover:
 - Mastery state transitions
 - Pin for tomorrow rule
 - Review logging
+- Training sentence generation (13 tests)
+- Slot difficulty scaling
+- Duplicate prevention
 
 ## 🔒 Privacy
 
