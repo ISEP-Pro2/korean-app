@@ -235,6 +235,67 @@ Tests cover:
 - Slot difficulty scaling
 - Duplicate prevention
 
+## 🚀 Deployment
+
+### Vercel (Recommended)
+
+The easiest way to deploy K-8M is on [Vercel](https://vercel.com):
+
+1. **Push to GitHub** (already done: [korean-app](https://github.com/ISEP-Pro2/korean-app))
+
+2. **Connect to Vercel**:
+   - Go to [vercel.com](https://vercel.com)
+   - Click "New Project"
+   - Select GitHub repository `korean-app`
+   - Configure project (auto-detected as Next.js)
+   - Click "Deploy"
+
+3. **Auto-deployment**: Every push to `main` branch auto-deploys
+
+**Default config** (`vercel.json`):
+- Node.js 18.x
+- Build command: `npm run build`
+- Start command: `npm start`
+
+### Environment Variables
+
+No environment variables required! K-8M is completely local-first.
+
+All data stored in browser IndexedDB:
+- No API calls
+- No backend required
+- No secrets needed
+
+### Custom Domain
+
+After Vercel deployment:
+1. Go to Project Settings → Domains
+2. Add your custom domain
+3. Follow DNS configuration steps
+
+### Build Optimization
+
+Current build size:
+- First Load JS: **138 kB**
+- Static: **16 kB**
+
+Key optimizations:
+- ✅ Next.js 14 production build
+- ✅ Tree-shaking of unused code
+- ✅ Automatic image optimization
+- ✅ Service Worker caching
+
+### Local Production Build
+
+To test production build locally:
+
+```bash
+npm run build
+npm start
+```
+
+Then open [http://localhost:3000](http://localhost:3000)
+
 ## 🔒 Privacy
 
 - No data sent to servers

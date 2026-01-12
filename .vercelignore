@@ -1,0 +1,24 @@
+# Vercel
+.vercel
+.vercel_build_output
+.next/cache
+
+# Node
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Testing
+.nyc_output
+coverage
+
+# Misc
+.DS_Store
+*.pem
+
+# Environment
+.env
+.env.local
+.env.*.local
