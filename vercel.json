@@ -4,12 +4,6 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "framework": "nextjs",
-  "nodeVersion": "18.x",
-  "env": {
-    "NODE_ENV": {
-      "value": "production"
-    }
-  },
   "headers": [
     {
       "source": "/service-worker.js",

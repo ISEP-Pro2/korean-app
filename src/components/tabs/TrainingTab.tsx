@@ -7,7 +7,7 @@ import { trainingPatterns } from '@/data/training.seed'
 import { generateTrainingSet } from '@/lib/training-generator'
 import { useTextToSpeech } from '@/hooks/useTextToSpeech'
 
-type SessionStep = 'idle' | 'listen' | 'repeat' | 'recall' | 'rate'
+type SessionStep = 'idle' | 'french' | 'reveal' | 'listen' | 'rate'
 
 interface TrainingSentence {
   patternId: string
@@ -56,19 +56,24 @@ export default function TrainingTab() {
     if (sentences.length === 0) return
     setCurrentIndex(0)
     setSessionComplete(false)
+    setStep('french')
+  }
+
+  function handleFrench() {
+    setStep('reveal')
+  }
+
+  function handleReveal() {
     setStep('listen')
-    speak(sentences[0].korean)
+    // Auto-play audio when revealing Korean
+    setTimeout(() => speak(sentences[currentIndex].korean), 100)
   }
 
   function handleListen() {
     speak(sentences[currentIndex].korean)
   }
 
-  function handleRepeatDone() {
-    setStep('recall')
-  }
-
-  function handleRecallDone() {
+  function handleListenDone() {
     setStep('rate')
   }
 
@@ -82,8 +87,7 @@ export default function TrainingTab() {
     if (currentIndex < sentences.length - 1) {
       const nextIndex = currentIndex + 1
       setCurrentIndex(nextIndex)
-      setStep('listen')
-      speak(sentences[nextIndex].korean)
+      setStep('french')
     } else {
       setSessionComplete(true)
       setStep('idle')
@@ -176,40 +180,37 @@ export default function TrainingTab() {
       {/* Step indicator */}
       <div className="text-center">
         <span className="text-sm text-gray-400 uppercase tracking-wide">
+          {step === 'french' && '생각해보세요'}
+          {step === 'reveal' && '정답 보기'}
           {step === 'listen' && '듣기'}
-          {step === 'repeat' && '따라하기'}
-          {step === 'recall' && '기억하기'}
           {step === 'rate' && '평가'}
         </span>
       </div>
 
       {/* Sentence display */}
       <div className="bg-gray-800 rounded-xl p-6 min-h-[200px] flex flex-col justify-center items-center space-y-4">
-        {(step === 'listen' || step === 'repeat') && (
+        {step === 'french' && (
           <>
-            <p className="text-2xl text-center leading-relaxed">
+            <p className="text-gray-400 text-sm mb-2">질문</p>
+            <p className="text-3xl text-center leading-relaxed font-medium">
+              {currentSentence.english}
+            </p>
+            <p className="text-gray-500 text-sm mt-4">어떻게 말할까요?</p>
+          </>
+        )}
+
+        {step === 'reveal' && (
+          <>
+            <p className="text-gray-400 text-sm mb-2">정답</p>
+            <p className="text-3xl text-center leading-relaxed">
               {currentSentence.korean}
             </p>
-            <p className="text-gray-400 text-center">
-              {currentSentence.english}
-            </p>
           </>
         )}
 
-        {step === 'recall' && (
+        {(step === 'listen' || step === 'rate') && (
           <>
-            <p className="text-gray-400 text-center mb-4">
-              {currentSentence.english}
-            </p>
-            <p className="text-2xl text-center leading-relaxed text-gray-500">
-              ???
-            </p>
-          </>
-        )}
-
-        {step === 'rate' && (
-          <>
-            <p className="text-2xl text-center leading-relaxed">
+            <p className="text-3xl text-center leading-relaxed">
               {currentSentence.korean}
             </p>
             <p className="text-gray-400 text-center">
@@ -221,25 +222,25 @@ export default function TrainingTab() {
 
       {/* Action buttons */}
       <div className="flex flex-col space-y-3">
-        {(step === 'listen' || step === 'repeat') && (
-          <>
-            <button
-              onClick={handleListen}
-              disabled={isSpeaking}
-              className="w-full py-4 bg-gray-700 text-white rounded-xl text-lg disabled:opacity-50"
-            >
-              {isSpeaking ? '재생 중...' : '🔊 다시 듣기'}
-            </button>
-            <button
-              onClick={() => setStep('repeat')}
-              className="w-full py-4 bg-primary text-white rounded-xl text-lg"
-            >
-              따라했어요
-            </button>
-          </>
+        {step === 'french' && (
+          <button
+            onClick={handleFrench}
+            className="w-full py-4 bg-primary text-white rounded-xl text-lg"
+          >
+            답변 생각함
+          </button>
         )}
 
-        {step === 'repeat' && (
+        {step === 'reveal' && (
+          <button
+            onClick={handleReveal}
+            className="w-full py-4 bg-primary text-white rounded-xl text-lg"
+          >
+            🔊 정답 듣기
+          </button>
+        )}
+
+        {step === 'listen' && (
           <>
             <button
               onClick={handleListen}
@@ -249,21 +250,10 @@ export default function TrainingTab() {
               {isSpeaking ? '재생 중...' : '🔊 다시 듣기'}
             </button>
             <button
-              onClick={handleRepeatDone}
+              onClick={handleListenDone}
               className="w-full py-4 bg-primary text-white rounded-xl text-lg"
             >
               다음 단계
-            </button>
-          </>
-        )}
-
-        {step === 'recall' && (
-          <>
-            <button
-              onClick={handleRecallDone}
-              className="w-full py-4 bg-primary text-white rounded-xl text-lg"
-            >
-              정답 확인
             </button>
           </>
         )}
