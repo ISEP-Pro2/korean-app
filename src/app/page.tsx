@@ -4,13 +4,14 @@ import { useState } from 'react'
 import { useApp } from '@/lib/context'
 import TabNav from '@/components/TabNav'
 import TodayTab from '@/components/tabs/TodayTab'
+import TrainingTab from '@/components/tabs/TrainingTab'
 import SentencesTab from '@/components/tabs/SentencesTab'
 import ListeningTab from '@/components/tabs/ListeningTab'
 import PartnerTab from '@/components/tabs/PartnerTab'
 import ProgressTab from '@/components/tabs/ProgressTab'
 import SettingsTab from '@/components/tabs/SettingsTab'
 
-export type TabId = 'today' | 'sentences' | 'listening' | 'partner' | 'progress' | 'settings'
+export type TabId = 'today' | 'training' | 'sentences' | 'listening' | 'partner' | 'progress' | 'settings'
 
 export default function Home() {
   const { isLoading } = useApp()
@@ -33,6 +34,8 @@ export default function Home() {
     switch (activeTab) {
       case 'today':
         return <TodayTab />
+      case 'training':
+        return <TrainingTab />
       case 'sentences':
         return <SentencesTab />
       case 'listening':

@@ -9,6 +9,7 @@ interface TabNavProps {
 
 const tabs: { id: TabId; label: string; icon: string }[] = [
   { id: 'today', label: '오늘', icon: '📅' },
+  { id: 'training', label: '훈련', icon: '🎯' },
   { id: 'sentences', label: '문장', icon: '💬' },
   { id: 'listening', label: '듣기', icon: '🎧' },
   { id: 'partner', label: '파트너', icon: '👥' },
