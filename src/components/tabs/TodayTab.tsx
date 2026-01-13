@@ -30,6 +30,7 @@ export default function TodayTab() {
   const [todayLog, setTodayLog] = useState<{
     listeningMinutes: number
     speakingMinutes: number
+    partnerMinutes: number
     sentencesCompleted: number
     completed: boolean
   } | null>(null)
@@ -42,6 +43,7 @@ export default function TodayTab() {
       setTodayLog({
         listeningMinutes: log.listeningMinutes,
         speakingMinutes: log.speakingMinutes,
+        partnerMinutes: log.partnerMinutes,
         sentencesCompleted: log.sentencesCompleted,
         completed: log.completed,
       })
@@ -61,25 +63,50 @@ export default function TodayTab() {
     const sentences = await loadSentences()
     setSession({
       ...initialSessionState,
-      phase: 'listening',
-      listeningStartTime: Date.now(),
+      phase: 'speaking',
+      speakingStartTime: Date.now(),
       todaySentences: sentences,
     })
   }
 
-  // Complete listening phase
-  const handleListeningComplete = async (minutes: number, loops: number) => {
+  // Complete speaking phase (move to partner)
+  const handleSpeakingComplete = async () => {
+    const speakingMinutes = Math.round((Date.now() - (session.speakingStartTime || 0)) / 60000)
     await updateTodayLog({
-      listeningMinutes: (todayLog?.listeningMinutes || 0) + minutes,
+      speakingMinutes: (todayLog?.speakingMinutes || 0) + speakingMinutes,
+      sentencesCompleted: (todayLog?.sentencesCompleted || 0) + session.todaySentences.length,
+      spokeKorean: true,
     })
-    setTodayLog(prev => prev ? { ...prev, listeningMinutes: prev.listeningMinutes + minutes } : null)
+    setTodayLog(prev => prev ? {
+      ...prev,
+      speakingMinutes: prev.speakingMinutes + speakingMinutes,
+      sentencesCompleted: prev.sentencesCompleted + session.todaySentences.length,
+    } : null)
     
     setSession(prev => ({
       ...prev,
-      phase: 'speaking',
-      speakingStartTime: Date.now(),
-      loopCount: loops,
+      phase: 'partner',
+      partnerStartTime: Date.now(),
     }))
+  }
+
+  // Complete listening phase (final phase - show friction rating)
+  const handleListeningComplete = async (minutes: number, loops: number) => {
+    await updateTodayLog({
+      listeningMinutes: (todayLog?.listeningMinutes || 0) + minutes,
+      completed: true,
+    })
+    setTodayLog(prev => prev ? { 
+      ...prev, 
+      listeningMinutes: prev.listeningMinutes + minutes,
+      completed: true,
+    } : null)
+    
+    setSession(prev => ({
+      ...prev,
+      phase: 'completed',
+    }))
+    setShowFrictionRating(true)
   }
 
   // Rate a sentence
@@ -94,25 +121,10 @@ export default function TodayTab() {
     const nextIndex = session.currentSentenceIndex + 1
     
     if (nextIndex >= session.todaySentences.length) {
-      // Speaking complete
-      const speakingMinutes = Math.round((Date.now() - (session.speakingStartTime || 0)) / 60000)
-      await updateTodayLog({
-        speakingMinutes: (todayLog?.speakingMinutes || 0) + speakingMinutes,
-        sentencesCompleted: (todayLog?.sentencesCompleted || 0) + session.todaySentences.length,
-        spokeKorean: true,
-      })
-      setTodayLog(prev => prev ? {
-        ...prev,
-        speakingMinutes: prev.speakingMinutes + speakingMinutes,
-        sentencesCompleted: prev.sentencesCompleted + session.todaySentences.length,
-      } : null)
-      
-      setSession(prev => ({
-        ...prev,
-        phase: 'partner',
-        partnerStartTime: Date.now(),
-      }))
+      // Speaking complete - move to partner
+      await handleSpeakingComplete()
     } else {
+      // Move to next sentence
       setSession(prev => ({
         ...prev,
         currentSentenceIndex: nextIndex,
@@ -126,14 +138,16 @@ export default function TodayTab() {
     if (completed) {
       const partnerMinutes = Math.round((Date.now() - (session.partnerStartTime || 0)) / 60000)
       await updateTodayLog({
-        partnerMinutes: (todayLog?.speakingMinutes || 0) + partnerMinutes,
+        partnerMinutes: (todayLog?.partnerMinutes || 0) + partnerMinutes,
       })
     }
     
-    await updateTodayLog({ completed: true })
-    setTodayLog(prev => prev ? { ...prev, completed: true } : null)
-    setSession(prev => ({ ...prev, phase: 'completed' }))
-    setShowFrictionRating(true)
+    // Move to listening phase (now the final phase)
+    setSession(prev => ({ 
+      ...prev, 
+      phase: 'listening',
+      listeningStartTime: Date.now(),
+    }))
   }
 
   // Handle friction rating
