@@ -64,8 +64,17 @@ export default function TrainingTab() {
   }
 
   function handleReveal() {
+    setStep('rate')
+  }
+
+  function handleRate(rating: 'easy' | 'medium' | 'hard') {
+    const currentSentence = sentences[currentIndex]
+    
+    // Log the review
+    logPatternReview(currentSentence.patternId, rating)
+
+    // Move to listen step
     setStep('listen')
-    // Auto-play audio when revealing Korean
     setTimeout(() => speak(sentences[currentIndex].korean), 100)
   }
 
@@ -73,16 +82,9 @@ export default function TrainingTab() {
     speak(sentences[currentIndex].korean)
   }
 
-  function handleListenDone() {
-    setStep('rate')
-  }
-
-  async function handleRate(rating: 'easy' | 'medium' | 'hard') {
+  async function handleListenDone() {
     const currentSentence = sentences[currentIndex]
     
-    // Log the review
-    await logPatternReview(currentSentence.patternId, rating)
-
     // Move to next sentence or complete
     if (currentIndex < sentences.length - 1) {
       const nextIndex = currentIndex + 1
@@ -182,8 +184,8 @@ export default function TrainingTab() {
         <span className="text-sm text-gray-400 uppercase tracking-wide">
           {step === 'french' && '생각해보세요'}
           {step === 'reveal' && '정답 보기'}
-          {step === 'listen' && '듣기'}
           {step === 'rate' && '평가'}
+          {step === 'listen' && '듣기'}
         </span>
       </div>
 
@@ -236,26 +238,8 @@ export default function TrainingTab() {
             onClick={handleReveal}
             className="w-full py-4 bg-primary text-white rounded-xl text-lg"
           >
-            🔊 정답 듣기
+            평가하기
           </button>
-        )}
-
-        {step === 'listen' && (
-          <>
-            <button
-              onClick={handleListen}
-              disabled={isSpeaking}
-              className="w-full py-4 bg-gray-700 text-white rounded-xl text-lg disabled:opacity-50"
-            >
-              {isSpeaking ? '재생 중...' : '🔊 다시 듣기'}
-            </button>
-            <button
-              onClick={handleListenDone}
-              className="w-full py-4 bg-primary text-white rounded-xl text-lg"
-            >
-              다음 단계
-            </button>
-          </>
         )}
 
         {step === 'rate' && (
@@ -279,6 +263,24 @@ export default function TrainingTab() {
               어려움
             </button>
           </div>
+        )}
+
+        {step === 'listen' && (
+          <>
+            <button
+              onClick={handleListen}
+              disabled={isSpeaking}
+              className="w-full py-4 bg-gray-700 text-white rounded-xl text-lg disabled:opacity-50"
+            >
+              {isSpeaking ? '재생 중...' : '🔊 다시 듣기'}
+            </button>
+            <button
+              onClick={handleListenDone}
+              className="w-full py-4 bg-primary text-white rounded-xl text-lg"
+            >
+              다음 문장
+            </button>
+          </>
         )}
       </div>
     </div>
